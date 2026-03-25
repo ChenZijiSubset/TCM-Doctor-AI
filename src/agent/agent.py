@@ -36,21 +36,31 @@ class Agent:
 当前处于测试模式，尚未调用本地模型。
 
 2. 可能证候排序
-- 测试候选1
-- 测试候选2
-- 测试候选3
+- 候选1
+- 候选2
+- 候选3
 
 3. 证据依据
+证型排序结果：
 {ranked_text}
 
+检索资料：
+{context[:600]}
+
 4. 建议下一步
-先检查“症状 → 打分 → 证型排序”流程是否正常，再接入真实模型。
+先检查“症状 → 打分 → 证型排序 → 检索”流程是否正常，再接入真实模型。
 
 5. 风险提示
 本结果仅用于功能测试，不可作为临床建议。
 """
 
-    def answer(self, question: str, ranked_text: str, context: str, history: List[Dict[str, str]]) -> str:
+    def answer(
+        self,
+        question: str,
+        ranked_text: str,
+        context: str,
+        history: List[Dict[str, str]],
+    ) -> str:
         if TEST_MODE:
             return self.mock_answer(question, ranked_text, context)
 
