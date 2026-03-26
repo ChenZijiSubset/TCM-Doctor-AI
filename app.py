@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import streamlit as st
@@ -119,7 +120,7 @@ def main():
     with st.sidebar:
         st.header("运行状态")
         st.write(f"知识条目数: {len(knowledge)}")
-        st.write(f"测试模式: {'是' if agent.__class__ else '否'}")
+        st.write(f"测试模式: {'是' if os.getenv('TEST_MODE', '0') == '1' else '否'}")
         st.caption("如果 TEST_MODE=1，会返回假回答，用于先测试整条流程。")
 
     if "chat_history" not in st.session_state:
