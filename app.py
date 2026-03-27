@@ -11,6 +11,13 @@ from src.inference.ranker import rank_syndromes
 from src.rag.embedder import Embedder
 from src.rag.vectorstore import VectorStore
 from src.safety.guard import has_risk
+from src.user_state import (
+    load_users,
+    save_users,
+    get_or_create_user,
+    update_user_record,
+    build_user_summary,
+)
 
 APP_TITLE = "中医AI Agent Demo"
 DATA_FILE = Path("data/knowledge.json")
@@ -109,6 +116,12 @@ def load_system():
     return knowledge, vs
 
 
+def get_user_db():
+    if "user_db" not in st.session_state:
+        st.session_state.user_db = load_users()
+    return st.session_state.user_db
+
+
 def main():
     st.set_page_config(page_title=APP_TITLE, layout="wide")
     st.title(APP_TITLE)
@@ -117,14 +130,24 @@ def main():
     knowledge, vs = load_system()
     agent = Agent()
 
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    user_id = st.text_input("用户ID", value="user_001")
+
+    user_db = get_user_db()
+    user = get_or_create_user(user_db, user_id)
+
     with st.sidebar:
         st.header("运行状态")
         st.write(f"知识条目数: {len(knowledge)}")
         st.write(f"测试模式: {'是' if os.getenv('TEST_MODE', '0') == '1' else '否'}")
-        st.caption("如果 TEST_MODE=1，会返回假回答，用于先测试整条流程。")
+        st.write(f"当前用户: {user_id}")
+        st.write(f"当前状态: {user.get('current_state', {}).get('syndrome', '未知')}")
+        st.caption("这里记录的是用户健康状态，不是病人诊疗记录。")
 
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
+        with st.expander("用户历史摘要", expanded=False):
+            st.text(build_user_summary(user))
 
     user_input = st.text_area(
         "输入症状",
@@ -162,10 +185,18 @@ def main():
         retrieval_results = vs.search(user_input, top_k=4)
         context_text = build_context_text(retrieval_results)
 
+        top_result = ranked[0]
+        update_user_record(user_db, user_id, user_features, top_result)
+        save_users(user_db)
+
+        user = get_or_create_user(user_db, user_id)
+        user_memory = build_user_summary(user)
+
         answer = agent.answer(
             question=user_input,
             ranked_text=ranked_text,
             context=context_text,
+            user_memory=user_memory,
             history=st.session_state.chat_history,
         )
 
@@ -187,6 +218,10 @@ def main():
                 st.write("方剂:", ", ".join(r.formulas) if r.formulas else "无")
                 st.write("来源:", r.source)
                 st.write("说明:", r.explain)
+
+    st.subheader("用户健康状态与历史")
+    user = get_or_create_user(user_db, user_id)
+    st.write(build_user_summary(user))
 
     st.subheader("模型输出")
     for msg in st.session_state.chat_history:

@@ -1,0 +1,75 @@
+{
+  "user_001": {
+    "basic_info": {
+      "name": "匿名",
+      "age": null,
+      "gender": null
+    },
+    "current_state": {
+      "syndrome": "风寒表证",
+      "confidence": 45.0,
+      "last_update": "2026-03-26"
+    },
+    "history": [
+      {
+        "date": "2026-03-26",
+        "symptoms": [
+          "恶寒重",
+          "无汗",
+          "头痛"
+        ],
+        "tongue": [],
+        "pulse": [],
+        "diagnosis": "风寒表证",
+        "score": 45.0,
+        "treatment": "辛温解表",
+        "formulas": [
+          "麻黄汤"
+        ]
+      },
+      {
+        "date": "2026-03-26",
+        "symptoms": [
+          "咽痛",
+          "黄痰"
+        ],
+        "tongue": [],
+        "pulse": [],
+        "diagnosis": "风热表证",
+        "score": 21.05,
+        "treatment": "辛凉解表",
+        "formulas": [
+          "银翘散"
+        ]
+      },
+      {
+        "date": "2026-03-26",
+        "symptoms": [
+          "恶寒重",
+          "无汗",
+          "头痛"
+        ],
+        "tongue": [],
+        "pulse": [],
+        "diagnosis": "风寒表证",
+        "score": 45.0,
+        "treatment": "辛温解表",
+        "formulas": [
+          "麻黄汤"
+        ]
+      }
+    ],
+    "trajectory": [
+      {
+        "from": "风寒表证",
+        "to": "风热表证",
+        "date": "2026-03-26"
+      },
+      {
+        "from": "风热表证",
+        "to": "风寒表证",
+        "date": "2026-03-26"
+      }
+    ]
+  }
+}
